@@ -1,14 +1,11 @@
 package edu.ucne.apiplanets.data.remote.dto
 
-import com.squareup.moshi.JsonClass
 import edu.ucne.apiplanets.domain.model.Planet
 
-@JsonClass(generateAdapter = true)
 data class PlanetResponseDto(
     val items: List<PlanetDto>
 )
 
-@JsonClass(generateAdapter = true)
 data class PlanetDto(
     val id: Int,
     val name: String,
