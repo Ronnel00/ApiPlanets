@@ -4,6 +4,8 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -22,13 +24,15 @@ import edu.ucne.apiplanets.domain.model.Planet
 @Composable
 fun ListScreen(
     viewModel: ListViewModel = hiltViewModel(),
-    onPlanetClick: (Int) -> Unit
+    onPlanetClick: (Int) -> Unit,
+    onMenuClick: () -> Unit = {}
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     ListBodyScreen(
         state = state,
         onEvent = viewModel::onEvent,
-        onPlanetClick = onPlanetClick
+        onPlanetClick = onPlanetClick,
+        onMenuClick = onMenuClick
     )
 }
 
@@ -37,12 +41,18 @@ fun ListScreen(
 fun ListBodyScreen(
     state: ListUiState,
     onEvent: (ListUiEvent) -> Unit,
-    onPlanetClick: (Int) -> Unit
+    onPlanetClick: (Int) -> Unit,
+    onMenuClick: () -> Unit = {}
 ) {
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text("Planetas Dragon Ball") }
+                title = { Text("Planetas Dragon Ball") },
+                navigationIcon = {
+                    IconButton(onClick = onMenuClick) {
+                        Icon(Icons.Default.Menu, contentDescription = "Menú")
+                    }
+                }
             )
         }
     ) { padding ->
@@ -152,7 +162,8 @@ fun ListBodyScreenPreview() {
         ListBodyScreen(
             state = ListUiState(planets = samplePlanets),
             onEvent = {},
-            onPlanetClick = {}
+            onPlanetClick = {},
+            onMenuClick = {}
         )
     }
 }
