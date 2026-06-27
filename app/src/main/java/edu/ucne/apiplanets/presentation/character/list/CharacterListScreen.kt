@@ -1,15 +1,17 @@
-package edu.ucne.apiplanets.presentation.list
+package edu.ucne.apiplanets.presentation.character.list
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
@@ -18,36 +20,36 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
-import edu.ucne.apiplanets.domain.model.Planet
+import edu.ucne.apiplanets.domain.model.Character
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ListScreen(
-    viewModel: ListViewModel = hiltViewModel(),
-    onPlanetClick: (Int) -> Unit,
+fun CharacterListScreen(
+    viewModel: CharacterListViewModel = hiltViewModel(),
+    onCharacterClick: (Int) -> Unit,
     onMenuClick: () -> Unit = {}
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
-    ListBodyScreen(
+    CharacterListBodyScreen(
         state = state,
         onEvent = viewModel::onEvent,
-        onPlanetClick = onPlanetClick,
+        onCharacterClick = onCharacterClick,
         onMenuClick = onMenuClick
     )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ListBodyScreen(
-    state: ListUiState,
-    onEvent: (ListUiEvent) -> Unit,
-    onPlanetClick: (Int) -> Unit,
+fun CharacterListBodyScreen(
+    state: CharacterListUiState,
+    onEvent: (CharacterListUiEvent) -> Unit,
+    onCharacterClick: (Int) -> Unit,
     onMenuClick: () -> Unit = {}
 ) {
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text("Planetas Dragon Ball") },
+                title = { Text("Personajes Dragon Ball") },
                 navigationIcon = {
                     IconButton(onClick = onMenuClick) {
                         Icon(Icons.Default.Menu, contentDescription = "Menú")
@@ -72,13 +74,27 @@ fun ListBodyScreen(
                 ) {
                     OutlinedTextField(
                         value = state.filterName,
-                        onValueChange = { onEvent(ListUiEvent.UpdateFilterName(it)) },
-                        label = { Text("Buscar planeta...") },
+                        onValueChange = { onEvent(CharacterListUiEvent.UpdateFilterName(it)) },
+                        label = { Text("Buscar por nombre...") },
+                        modifier = Modifier.fillMaxWidth(),
+                        singleLine = true
+                    )
+                    OutlinedTextField(
+                        value = state.filterRace,
+                        onValueChange = { onEvent(CharacterListUiEvent.UpdateFilterRace(it)) },
+                        label = { Text("Buscar por raza...") },
+                        modifier = Modifier.fillMaxWidth(),
+                        singleLine = true
+                    )
+                    OutlinedTextField(
+                        value = state.filterGender,
+                        onValueChange = { onEvent(CharacterListUiEvent.UpdateFilterGender(it)) },
+                        label = { Text("Buscar por género...") },
                         modifier = Modifier.fillMaxWidth(),
                         singleLine = true
                     )
                     Button(
-                        onClick = { onEvent(ListUiEvent.Search) },
+                        onClick = { onEvent(CharacterListUiEvent.Search) },
                         modifier = Modifier.align(Alignment.End)
                     ) {
                         Text("Buscar")
@@ -103,10 +119,10 @@ fun ListBodyScreen(
             LazyColumn(
                 contentPadding = PaddingValues(16.dp)
             ) {
-                items(state.planets) { planet ->
-                    PlanetItem(
-                        planet = planet,
-                        onClick = { onPlanetClick(planet.id) }
+                items(state.characters) { character ->
+                    CharacterItem(
+                        character = character,
+                        onClick = { onCharacterClick(character.id) }
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                 }
@@ -116,8 +132,8 @@ fun ListBodyScreen(
 }
 
 @Composable
-fun PlanetItem(
-    planet: Planet,
+fun CharacterItem(
+    character: Character,
     onClick: () -> Unit
 ) {
     ElevatedCard(
@@ -130,21 +146,28 @@ fun PlanetItem(
             verticalAlignment = Alignment.CenterVertically
         ) {
             AsyncImage(
-                model = planet.image,
-                contentDescription = planet.name,
-                modifier = Modifier.size(64.dp),
-                contentScale = ContentScale.Crop
+                model = character.image,
+                contentDescription = character.name,
+                modifier = Modifier
+                    .size(80.dp)
+                    .clip(RoundedCornerShape(8.dp)),
+                contentScale = ContentScale.Fit
             )
             Spacer(modifier = Modifier.width(16.dp))
             Column {
                 Text(
-                    planet.name,
+                    character.name,
                     fontWeight = FontWeight.Bold
                 )
                 Text(
-                    if (planet.isDestroyed) "Destruido" else "Existe",
-                    color = if (planet.isDestroyed) Color.Red else Color.Green,
-                    style = MaterialTheme.typography.bodySmall
+                    "Raza: ${character.race}",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = Color.Gray
+                )
+                Text(
+                    "Género: ${character.gender}",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = Color.Gray
                 )
             }
         }
@@ -153,17 +176,16 @@ fun PlanetItem(
 
 @Preview(showBackground = true)
 @Composable
-fun ListBodyScreenPreview() {
-    val samplePlanets = listOf(
-        Planet(1, "Tierra", false, "Planeta de los humanos", ""),
-        Planet(2, "Vegeta", true, "Planeta destruido por Freezer", "")
+fun CharacterListBodyScreenPreview() {
+    val sampleCharacters = listOf(
+        Character(1, "Goku", "Saiyan", "Male", "El más poderoso", ""),
+        Character(2, "Vegeta", "Saiyan", "Male", "Príncipe Saiyan", "")
     )
     MaterialTheme {
-        ListBodyScreen(
-            state = ListUiState(planets = samplePlanets),
+        CharacterListBodyScreen(
+            state = CharacterListUiState(characters = sampleCharacters),
             onEvent = {},
-            onPlanetClick = {},
-            onMenuClick = {}
+            onCharacterClick = {}
         )
     }
 }

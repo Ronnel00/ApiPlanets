@@ -1,4 +1,4 @@
-package edu.ucne.apiplanets.presentation.detail
+package edu.ucne.apiplanets.presentation.character.detail
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -6,7 +6,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import dagger.hilt.android.lifecycle.HiltViewModel
 import edu.ucne.apiplanets.data.remote.Resource
-import edu.ucne.apiplanets.domain.usecase.GetPlanetDetailUseCase
+import edu.ucne.apiplanets.domain.usecase.GetCharacterDetailUseCase
 import edu.ucne.apiplanets.presentation.navigation.Screen
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -16,26 +16,28 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class DetailViewModel @Inject constructor(
-    private val getPlanetDetailUseCase: GetPlanetDetailUseCase,
+class CharacterDetailViewModel @Inject constructor(
+    private val getCharacterDetailUseCase: GetCharacterDetailUseCase,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow(DetailUiState())
-    val state: StateFlow<DetailUiState> = _state.asStateFlow()
+    private val _state = MutableStateFlow(CharacterDetailUiState())
+    val state: StateFlow<CharacterDetailUiState> = _state.asStateFlow()
 
     init {
-        val args = savedStateHandle.toRoute<Screen.PlanetDetail>()
-        loadPlanet(args.id)
+        val args = savedStateHandle.toRoute<Screen.CharacterDetail>()
+        loadCharacter(args.id)
     }
 
-    private fun loadPlanet(id: Int) {
+    private fun loadCharacter(id: Int) {
         viewModelScope.launch {
-            getPlanetDetailUseCase(id).collect { result ->
+            getCharacterDetailUseCase(id).collect { result ->
                 when (result) {
-                    is Resource.Loading -> _state.update { it.copy(isLoading = true) }
+                    is Resource.Loading -> _state.update {
+                        it.copy(isLoading = true, error = null)
+                    }
                     is Resource.Success -> _state.update {
-                        it.copy(isLoading = false, planet = result.data)
+                        it.copy(isLoading = false, character = result.data)
                     }
                     is Resource.Error -> _state.update {
                         it.copy(isLoading = false, error = result.message)
