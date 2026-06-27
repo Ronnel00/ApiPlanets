@@ -25,7 +25,7 @@ class DetailViewModel @Inject constructor(
     val state: StateFlow<DetailUiState> = _state.asStateFlow()
 
     init {
-        val args = savedStateHandle.toRoute<Screen.Detail>()
+        val args = savedStateHandle.toRoute<Screen.PlanetDetail>()
         loadPlanet(args.id)
     }
 
