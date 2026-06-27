@@ -7,7 +7,9 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import edu.ucne.apiplanets.data.remote.DragonBallApi
+import edu.ucne.apiplanets.data.repository.CharacterRepositoryImpl
 import edu.ucne.apiplanets.data.repository.PlanetRepositoryImpl
+import edu.ucne.apiplanets.domain.repository.CharacterRepository
 import edu.ucne.apiplanets.domain.repository.PlanetRepository
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
@@ -34,10 +36,19 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideRepository(api: DragonBallApi): PlanetRepositoryImpl =
+    fun providePlanetRepository(api: DragonBallApi): PlanetRepositoryImpl =
         PlanetRepositoryImpl(api)
 
     @Provides
     @Singleton
-    fun providePlanetRepository(impl: PlanetRepositoryImpl): PlanetRepository = impl
+    fun providePlanetRepositoryInterface(impl: PlanetRepositoryImpl): PlanetRepository = impl
+
+    @Provides
+    @Singleton
+    fun provideCharacterRepository(api: DragonBallApi): CharacterRepositoryImpl =
+        CharacterRepositoryImpl(api)
+
+    @Provides
+    @Singleton
+    fun provideCharacterRepositoryInterface(impl: CharacterRepositoryImpl): CharacterRepository = impl
 }
